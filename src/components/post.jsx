@@ -16,15 +16,24 @@ class Post extends Component {
   async componentDidMount() {
     const { id } = this.props.match.params;
     const { data: post } = await getPost(id);
-    console.log("dummy post", post);
     const category = getCategory(post.categoryId);
     this.setState({ post, category });
   }
 
   handleDeleteComment = comment_id => {
     if (confirm("Your comment will be deleted !")) {
-      console.log("deleting comment number ", comment_id);
+      //TODO delete comment
     }
+  };
+
+  handleLikes = b => {
+    const post = this.state.post;
+    if (b) {
+      post.likes = parseInt(post.likes) + 1;
+    } else {
+      post.dislikes = parseInt(post.dislikes) + 1;
+    }
+    this.setState({ post });
   };
 
   render() {
@@ -53,6 +62,20 @@ class Post extends Component {
           <h4 className="card-title">
             {` ${title} \t`}
             <span className="badge badge-secondary">{category}</span>
+            <div className="btn-group" role="group" style={{ marginLeft: 20 }}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => this.handleLikes(true)}
+              >
+                <i className="fa fa-thumbs-up"></i> {likes}
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => this.handleLikes(false)}
+              >
+                <i className="fa fa-thumbs-down"></i> {dislikes}
+              </button>
+            </div>
           </h4>
           <p className="mb-1 text-muted">
             by <Link to={`/profile/${username}`}>{username}</Link> at {date}
