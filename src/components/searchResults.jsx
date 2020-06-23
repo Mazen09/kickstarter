@@ -4,33 +4,36 @@ import MiniPost from "./miniPost";
 
 class SearchResults extends Component {
   state = {
-    search_results: []
+    data: {}
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     const { query } = this.props.match.params;
-    const search_results = getSearchResults(query);
-    this.setState({ search_results });
+    const { data } = await getSearchResults(query);
+    // console.log("data:", data);
+    this.setState({ data });
   }
 
   render() {
-    const { search_results } = this.state;
     const { query } = this.props.match.params;
+    const { count, posts } = this.state.data;
+    // console.log(count, posts);
     return (
       <div className="container" style={{ margin: 10 }}>
         <h3>
-          We found {search_results.length} results for ({query}){" "}
+          We found {count} results for ({query}){" "}
         </h3>
-        {search_results.map(minipost => (
-          <MiniPost
-            key={minipost._id}
-            id={minipost._id}
-            username={minipost.username}
-            date={minipost.date}
-            category={minipost.category_id}
-            title={minipost.title}
-          />
-        ))}
+        {posts &&
+          posts.map(minipost => (
+            <MiniPost
+              key={minipost.id}
+              id={minipost.id}
+              username={minipost.username}
+              date={minipost.date}
+              category={minipost.categoryId}
+              title={minipost.title}
+            />
+          ))}
       </div>
     );
   }

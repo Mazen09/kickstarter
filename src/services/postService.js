@@ -14,8 +14,9 @@ export function getMiniPosts() {
   return miniPosts;
 }
 
-export function getSearchResults(queru) {
-  return miniPosts;
+export function getSearchResults(query) {
+  // return miniPosts;
+  return http.get(`/search?q=${query}`);
 }
 
 export function getPost(id) {
