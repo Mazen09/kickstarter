@@ -55,6 +55,61 @@ class Form extends Component {
     this.setState({ data });
   }
 
+  onFileUploadChangeHandler = (event, target) => {
+    console.log(target);
+    if (this.fileErrorCheck(event)) {
+      console.log(event.target.files);
+      this.addFilesToTarget(target);
+    }
+  };
+
+  fileErrorCheck = event => {
+    let files = event.target.files;
+    let err = "";
+    const types = ["image/png", "image/jpeg", "image/gif", "video/mp4"];
+    for (var x = 0; x < files.length; x++) {
+      if (types.every(type => files[x].type !== type)) {
+        err += files[x].type + " is not a supported format\n";
+      }
+    }
+    if (err !== "") {
+      event.target.value = null;
+      console.log(err);
+      return false;
+    }
+    return true;
+  };
+
+  addFilesToTarget = target => {
+    let files = event.target.files;
+    const data = { ...this.state.data };
+
+    for (var x = 0; x < files.length; x++) {
+      if (files[x].type.includes("image")) {
+        data[target] += `\n<img src="${files[x].name}" class="rounded">`;
+      } else if (files[x].type.includes("video")) {
+        data[
+          target
+        ] += `\n<video width="420" height="345" src="${files[x].name}"/>`;
+      }
+    }
+    data["files"] = files;
+    console.log(data);
+    this.setState({ data });
+  };
+
+  renderFileUpload = target => {
+    return (
+      <div className="form-group files">
+        <input
+          type="file"
+          name="file"
+          multiple
+          onChange={() => this.onFileUploadChangeHandler(event, target)}
+        />
+      </div>
+    );
+  };
   renderTextareaEditButtonGroup(buttons, targetTextarea) {
     return (
       <div className="btn-group" role="group">

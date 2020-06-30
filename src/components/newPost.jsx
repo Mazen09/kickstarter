@@ -8,7 +8,8 @@ class NewPost extends Form {
     data: {
       content: "",
       categoryId: "",
-      tags: ""
+      tags: "",
+      files: {}
     },
     categories: [],
     errors: {}
@@ -23,7 +24,8 @@ class NewPost extends Form {
       .label("Category"),
     tags: Joi.string()
       .required()
-      .label("Tags")
+      .label("Tags"),
+    files: Joi.label("Files")
   };
 
   componentDidMount() {
@@ -40,8 +42,7 @@ class NewPost extends Form {
     const buttons = [
       { key: 1, label: "header", func: "\n# " },
       { key: 2, label: "code", func: "\n<pre></pre>" },
-      { key: 3, label: "image", func: `\n<img src="" class="rounded">` },
-      { key: 4, label: "link", func: `\n[](https://)` }
+      { key: 3, label: "link", func: `\n[](https://)` }
     ];
 
     return (
@@ -61,7 +62,7 @@ class NewPost extends Form {
                   {this.renderInput("tags", "Tags (comma separated)")}
                   {this.renderTextareaEditButtonGroup(buttons, "content")}
                   {this.renderTextarea("content", "write your post here", "10")}
-
+                  {this.renderFileUpload("content")}
                   {this.renderButton("Submit")}
                 </form>
               </div>
