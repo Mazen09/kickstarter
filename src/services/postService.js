@@ -1,4 +1,5 @@
 import http from "./httpService";
+import client from "./apigService";
 
 const miniPosts = [
   {
@@ -19,9 +20,11 @@ export function getSearchResults(query) {
   return http.get(`/search?q=${query}`);
 }
 
-export function getPost(id) {
-  // return posts.find(p => p._id === id);
-  return http.get(`/getpost/${id}`);
+export async function getPost(id) {
+  var pathParams = { postId: id };
+  var pathTemplate = '/posts/{postId}';
+  var method = 'GET';
+  client.invokeApi(pathParams, pathTemplate, method, {}, {})
 }
 
 export function getDummyPost(id) {
