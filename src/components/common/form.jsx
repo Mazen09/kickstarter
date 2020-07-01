@@ -4,6 +4,7 @@ import Input from "./input";
 import Textarea from "./textarea";
 import Select from "./select";
 import ReactMarkdown from "react-markdown";
+import { toast } from "react-toastify";
 
 class Form extends Component {
   state = {
@@ -49,32 +50,30 @@ class Form extends Component {
     this.setState({ data, errors });
   };
 
-  handleTextareaEditButtonGroup(target, func) {
-    const data = { ...this.state.data };
-    data[target] += func;
-    this.setState({ data });
-  }
-
   onFileUploadChangeHandler = (event, target) => {
     console.log(target);
-    if (this.fileErrorCheck(event)) {
+    if (this.filesSizeCheck(event)) {
       console.log(event.target.files);
       this.addFilesToTarget(target);
     }
   };
 
-  fileErrorCheck = event => {
+  filesSizeCheck = event => {
     let files = event.target.files;
     let err = "";
-    const types = ["image/png", "image/jpeg", "image/gif", "video/mp4"];
+    let maxSize = 5250880; //about 5MB
+    let size = 0;
     for (var x = 0; x < files.length; x++) {
-      if (types.every(type => files[x].type !== type)) {
-        err += files[x].type + " is not a supported format\n";
+      size += files[x].size;
+      if (size >= maxSize) {
+        err = "Max size exceeded";
+        break;
       }
     }
     if (err !== "") {
       event.target.value = null;
       console.log(err);
+      alert(err);
       return false;
     }
     return true;
@@ -83,18 +82,7 @@ class Form extends Component {
   addFilesToTarget = target => {
     let files = event.target.files;
     const data = { ...this.state.data };
-
-    for (var x = 0; x < files.length; x++) {
-      if (files[x].type.includes("image")) {
-        data[target] += `\n<img src="${files[x].name}" class="rounded">`;
-      } else if (files[x].type.includes("video")) {
-        data[
-          target
-        ] += `\n<video width="420" height="345" src="${files[x].name}"/>`;
-      }
-    }
-    data["files"] = files;
-    console.log(data);
+    data[target] = files;
     this.setState({ data });
   };
 
@@ -110,23 +98,6 @@ class Form extends Component {
       </div>
     );
   };
-  renderTextareaEditButtonGroup(buttons, targetTextarea) {
-    return (
-      <div className="btn-group" role="group">
-        {buttons.map(button => (
-          <button
-            key={button.key}
-            className="btn btn-secondary"
-            onClick={() =>
-              this.handleTextareaEditButtonGroup(targetTextarea, button.func)
-            }
-          >
-            {button.label}
-          </button>
-        ))}
-      </div>
-    );
-  }
 
   renderButton(label, className = "btn btn-outline-secondary") {
     return (

@@ -2,6 +2,7 @@ import React from "react";
 import Form from "./common/form";
 import Joi from "joi-browser";
 import { getCategories } from "./../services/categoryService";
+import { ToastContainer } from "react-toastify";
 
 class NewPost extends Form {
   state = {
@@ -35,16 +36,28 @@ class NewPost extends Form {
   }
 
   doSubmit = async () => {
-    console.log(this.state);
+    this.addAttachmentsToContent();
+    console.log("submitting", this.state);
+  };
+
+  addAttachmentsToContent = () => {
+    const data = this.state.data;
+    const files = data.files;
+    for (var x = 0; x < files.length; x++) {
+      if (files[x].type.includes("image")) {
+        data["content"] += `\n<img src="${files[x].name}" class="rounded">`;
+      } else if (files[x].type.includes("video")) {
+        data[
+          "content"
+        ] += `\n<iframe width="420" height="345" src="${files[x].name}"/>`;
+      } else {
+        data["content"] += `\n [${files[x].name}](${files[x].name})`;
+      }
+    }
+    this.setState({ data });
   };
 
   render() {
-    const buttons = [
-      { key: 1, label: "header", func: "\n# " },
-      { key: 2, label: "code", func: "\n<pre></pre>" },
-      { key: 3, label: "link", func: `\n[](https://)` }
-    ];
-
     return (
       <React.Fragment>
         <div className="container">
@@ -60,9 +73,12 @@ class NewPost extends Form {
                     this.state.categories
                   )}
                   {this.renderInput("tags", "Tags (comma separated)")}
-                  {this.renderTextareaEditButtonGroup(buttons, "content")}
-                  {this.renderTextarea("content", "write your post here", "10")}
-                  {this.renderFileUpload("content")}
+                  {this.renderTextarea(
+                    "content",
+                    "write your post here in markdown",
+                    "10"
+                  )}
+                  {this.renderFileUpload("files")}
                   {this.renderButton("Submit")}
                 </form>
               </div>

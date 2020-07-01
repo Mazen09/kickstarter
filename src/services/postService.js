@@ -22,9 +22,9 @@ export function getSearchResults(query) {
 
 export async function getPost(id) {
   var pathParams = { postId: id };
-  var pathTemplate = '/posts/{postId}';
-  var method = 'GET';
-  client.invokeApi(pathParams, pathTemplate, method, {}, {})
+  var pathTemplate = "/posts/{postId}";
+  var method = "GET";
+  client.invokeApi(pathParams, pathTemplate, method, {}, {});
 }
 
 export function getDummyPost(id) {
