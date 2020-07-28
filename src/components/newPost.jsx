@@ -3,6 +3,7 @@ import Form from "./common/form";
 import Joi from "joi-browser";
 import { getCategories } from "./../services/categoryService";
 import { ToastContainer } from "react-toastify";
+import Tags from "./tags";
 
 class NewPost extends Form {
   state = {
@@ -57,6 +58,15 @@ class NewPost extends Form {
     this.setState({ data });
   };
 
+  renderAttachments = () => {
+    const items = [];
+    const files = this.state.data.files;
+    for (var x = 0; x < files.length; x++) {
+      items.push(files[x].name);
+    }
+    return <Tags tags={items} />;
+  };
+
   render() {
     return (
       <React.Fragment>
@@ -78,6 +88,12 @@ class NewPost extends Form {
                     "write your post here in markdown",
                     "10"
                   )}
+                  <div className="card">
+                    <div className="card-body">
+                      <h4 className="card-title">attachments</h4>
+                      {this.renderAttachments()}
+                    </div>
+                  </div>
                   {this.renderFileUpload("files")}
                   {this.renderButton("Submit")}
                 </form>

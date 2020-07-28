@@ -11,20 +11,26 @@ const miniPosts = [
   }
 ];
 
-export function getMiniPosts() {
-  return miniPosts;
+export async function getMiniPosts(lastkey) {
+  // return miniPosts;
+  var pathParams = lastkey;
+  var pathTemplate = "/posts?lastkey={lastkey}";
+  var method = "GET";
+  return client.invokeApi(pathParams, pathTemplate, method, {}, {});
 }
 
-export function getSearchResults(query) {
-  // return miniPosts;
-  return http.get(`/search?q=${query}`);
+export function getSearchResults(q, s) {
+  var pathParams = { q, s };
+  var pathTemplate = "/search?q={q}&s={s}";
+  var method = "GET";
+  return client.invokeApi(pathParams, pathTemplate, method, {}, {});
 }
 
 export async function getPost(id) {
   var pathParams = { postId: id };
   var pathTemplate = "/posts/{postId}";
   var method = "GET";
-  client.invokeApi(pathParams, pathTemplate, method, {}, {});
+  return client.invokeApi(pathParams, pathTemplate, method, {}, {});
 }
 
 export function getDummyPost(id) {

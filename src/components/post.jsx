@@ -5,19 +5,19 @@ import ReactMarkdown from "react-markdown";
 import Tags from "./tags";
 import Comment from "./comment";
 import NewComment from "./newComment";
-import { getCategory } from "../services/categoryService";
+// import { getCategory } from "../services/categoryService";
 
 class Post extends Component {
   state = {
-    post: {},
-    category: ""
+    post: {}
   };
 
   async componentDidMount() {
     const { id } = this.props.match.params;
     const { data: post } = await getPost(id);
-    const category = getCategory(post.categoryId);
-    this.setState({ post, category });
+    // const category = getCategory(post.categoryId);
+    this.setState({ post });
+    console.log(post);
   }
 
   handleDeleteComment = comment_id => {
@@ -52,7 +52,7 @@ class Post extends Component {
       post_id: "1",
       username: "mazen09",
       date: "1-1-2020",
-      content: "this is bullshit"
+      content: "this is awsome"
     };
 
     const { category } = this.state;

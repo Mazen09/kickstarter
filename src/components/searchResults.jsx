@@ -4,19 +4,42 @@ import MiniPost from "./miniPost";
 
 class SearchResults extends Component {
   state = {
-    data: {}
+    posts: [],
+    count: 0,
+    size: 0
   };
 
   async componentDidMount() {
-    const { query } = this.props.match.params;
-    const { data } = await getSearchResults(query);
-    // console.log("data:", data);
-    this.setState({ data });
+    this.updateState();
+    document.addEventListener("scroll", this.handleScroll);
   }
+
+  handleScroll = async () => {
+    const { count, size } = this.state;
+    const scrollable =
+      document.documentElement.scrollHeight - window.innerHeight;
+    const scrolled = window.scrollY;
+    console.log(scrollable, scrolled, count, size);
+    if (scrollable - scrolled < 10 && size < count) {
+      this.updateState();
+    }
+  };
+
+  updateState = async () => {
+    const { query } = this.props.match.params;
+    let { posts, count, size } = this.state;
+    const { data } = await getSearchResults(query, size);
+    const { posts: newposts, count: newcount } = data;
+    posts = posts.concat(newposts);
+    count = newcount;
+    size = posts.length;
+    this.setState({ posts, count, size });
+    console.log(this.state);
+  };
 
   render() {
     const { query } = this.props.match.params;
-    const { count, posts } = this.state.data;
+    const { count, posts } = this.state;
     // console.log(count, posts);
     return (
       <div className="container" style={{ margin: 10 }}>

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { getCategory } from "../services/categoryService";
+// import { getCategory } from "../services/categoryService";
 
 class MiniPost extends Component {
   state = {};
@@ -11,9 +11,7 @@ class MiniPost extends Component {
         <div className="card-body">
           <h4 className="card-title">
             <Link to={`/post/${id}`}>{title}</Link>{" "}
-            <span className="badge badge-secondary">
-              {getCategory(category)}
-            </span>
+            <span className="badge badge-secondary">{category}</span>
           </h4>
           <p className="mb-1 text-muted">
             by <Link to={`/profile/${username}`}>{username}</Link> at {date}
