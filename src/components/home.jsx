@@ -38,14 +38,16 @@ class Home extends Component {
 
   updateState = async () => {
     let { posts, lastKey } = this.state;
-    const { data } = await getMiniPosts(lastKey);
-    const { posts: newposts, lastKey: newlastkey } = data;
-    posts = posts.concat(newposts);
-    lastKey = newlastkey;
     console.log("lastkey:", lastKey);
-    this.setState({ posts, lastKey });
-    console.log("dataaa", data);
-    console.log(this.state);
+    const { data } = await getMiniPosts(lastKey);
+    console.log("data", data);
+    const { posts: newposts, lastKey: newlastkey } = data;
+    if (lastKey !== newlastkey) {
+      posts = posts.concat(newposts);
+      lastKey = newlastkey;
+      this.setState({ posts, lastKey });
+      console.log(this.state);
+    }
   };
 
   render() {

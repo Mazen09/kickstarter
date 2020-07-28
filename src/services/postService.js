@@ -12,8 +12,7 @@ const miniPosts = [
 ];
 
 export async function getMiniPosts(lastkey) {
-  // return miniPosts;
-  var pathParams = lastkey;
+  var pathParams = { lastkey };
   var pathTemplate = "/posts?lastkey={lastkey}";
   var method = "GET";
   return client.invokeApi(pathParams, pathTemplate, method, {}, {});
