@@ -5,13 +5,11 @@ import { getMiniPosts } from "./../services/postService";
 class Home extends Component {
   state = {
     posts: [],
-    lastkey: ""
+    lastKey: ""
   };
 
   async componentDidMount() {
-    const { data } = await getMiniPosts("");
-    this.setState(data);
-    console.log(this.state);
+    this.updateState();
     document.addEventListener("scroll", this.handleScroll);
   }
 
@@ -31,21 +29,22 @@ class Home extends Component {
     const scrollable =
       document.documentElement.scrollHeight - window.innerHeight;
     const scrolled = window.scrollY;
-    const { lastkey } = this.state;
-    console.log(scrollable, scrolled, this.state.lastkey);
-    if (scrollable - scrolled < 10 && this.state.lastkey !== null) {
-      console.log("now");
+    const { lastKey } = this.state;
+    console.log(scrollable, scrolled, lastKey);
+    if (scrollable - scrolled < 10 && lastKey !== null) {
       this.updateState();
     }
   };
 
   updateState = async () => {
-    let { posts, lastkey } = this.state;
-    const { data } = await getMiniPosts(lastkey);
-    const { posts: newposts, lastkey: newlastkey } = data;
+    let { posts, lastKey } = this.state;
+    const { data } = await getMiniPosts(lastKey);
+    const { posts: newposts, lastKey: newlastkey } = data;
     posts = posts.concat(newposts);
-    lastkey = newlastkey;
-    this.setState({ posts, lastkey });
+    lastKey = newlastkey;
+    console.log("lastkey:", lastKey);
+    this.setState({ posts, lastKey });
+    console.log("dataaa", data);
     console.log(this.state);
   };
 
