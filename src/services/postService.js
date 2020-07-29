@@ -12,10 +12,10 @@ export async function getComments(postid, lastkey) {
   var pathTemplate;
   if (lastkey === "") {
     pathParams = { postid };
-    pathTemplate = "/comments/{postid}";
+    pathTemplate = "/comments?postid={postid}";
   } else {
     pathParams = { postid, lastkey };
-    pathTemplate = "/comments/{postid}?lastkey={lastkey}";
+    pathTemplate = "/comments?postid={postid}&lastkey={lastkey}";
   }
   var method = "GET";
   return client.invokeApi(pathParams, pathTemplate, method, {}, {});
