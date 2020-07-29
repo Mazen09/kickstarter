@@ -23,6 +23,10 @@ class NewComment extends Form {
 
   render() {
     const user = auth.getCurrentUser();
+
+    if (!user) {
+      return <React.Fragment></React.Fragment>;
+    }
     return (
       <div className="col card">
         <div className="card-body">

@@ -13,18 +13,6 @@ class Home extends Component {
     document.addEventListener("scroll", this.handleScroll);
   }
 
-  // laodMorePosts = async () => {
-  //   let lastkey = this.state.lastkey;
-  //   if (lastkey) {
-  //     console.log("loading more posts");
-  //     const oldposts = this.state.posts;
-  //     const { data } = await getMiniPosts(lastkey);
-  //     const posts = oldposts.concat(data.posts);
-  //     lastkey = data.lastkey;
-  //     this.setState({ posts, lastkey });
-  //   }
-  // };
-
   handleScroll = async () => {
     const scrollable =
       document.documentElement.scrollHeight - window.innerHeight;
@@ -33,6 +21,9 @@ class Home extends Component {
     console.log(scrollable, scrolled, lastKey);
     if (scrollable - scrolled < 10 && lastKey !== null) {
       this.updateState();
+    }
+    if (lastKey === null) {
+      document.removeEventListener("scroll", this.handleScroll);
     }
   };
 

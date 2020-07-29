@@ -23,6 +23,9 @@ class SearchResults extends Component {
     if (scrollable - scrolled < 10 && size < count) {
       this.updateState();
     }
+    if (size === count) {
+      document.removeEventListener("scroll", this.handleScroll);
+    }
   };
 
   updateState = async () => {

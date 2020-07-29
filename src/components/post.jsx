@@ -1,27 +1,59 @@
 import React, { Component } from "react";
-import { getPost, getDummyPost } from "./../services/postService";
+import { getPost, getComments } from "./../services/postService";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import Tags from "./tags";
 import Comment from "./comment";
 import NewComment from "./newComment";
-// import { getCategory } from "../services/categoryService";
 
 class Post extends Component {
   state = {
-    post: {}
+    post: {},
+    comments: [],
+    lastKey: ""
   };
 
   async componentDidMount() {
+    console.log("mounting");
     const { id } = this.props.match.params;
     const { data: post } = await getPost(id);
-    // const category = getCategory(post.categoryId);
     this.setState({ post });
-    console.log(post);
+    this.updateComments();
+    document.addEventListener("scroll", this.handleScroll);
   }
+
+  handleScroll = async () => {
+    const scrollable =
+      document.documentElement.scrollHeight - window.innerHeight;
+    const scrolled = window.scrollY;
+    const { lastKey } = this.state;
+    console.log(scrollable, scrolled, lastKey);
+    if (scrollable - scrolled < 10 && lastKey !== null) {
+      this.updateComments();
+    }
+    if (lastKey === null) {
+      document.removeEventListener("scroll", this.handleScroll);
+    }
+  };
+
+  updateComments = async () => {
+    const { id } = this.state.post;
+    let { comments, lastKey } = this.state;
+    console.log("lastkey: ", lastKey);
+    const { data } = await getComments(id, lastKey);
+    console.log("data: ", data);
+    const { comments: newComments, lastKey: newlastKey } = data;
+    if (lastKey !== newlastKey) {
+      comments = comments.concat(newComments);
+      lastKey = newlastKey;
+      this.setState({ comments, lastKey });
+      console.log("State: ", this.state);
+    }
+  };
 
   handleDeleteComment = comment_id => {
     if (confirm("Your comment will be deleted !")) {
+      console.log(comment_id);
       //TODO delete comment
     }
   };
@@ -41,21 +73,19 @@ class Post extends Component {
       title,
       username,
       date,
+      category,
       tags,
       content,
       likes,
       dislikes
     } = this.state.post;
 
-    const comment = {
-      id: "1",
-      post_id: "1",
-      username: "mazen09",
-      date: "1-1-2020",
-      content: "this is awsome"
-    };
+    const { comments } = this.state;
 
-    const { category } = this.state;
+    if (!title) {
+      return <React.Fragment></React.Fragment>;
+    }
+
     return (
       <div className="card" style={{ margin: 10 }}>
         <div className="card-body">
@@ -86,15 +116,23 @@ class Post extends Component {
               <ReactMarkdown source={content} escapeHtml={false} />
             </div>
           </div>
-          <NewComment />
-          <Comment
-            id={comment.id}
-            post_id={comment.post_id}
-            username={comment.username}
-            date={comment.date}
-            content={comment.content}
-            onDelete={this.handleDeleteComment}
-          />
+          <div className="col card">
+            <div className="card-body">
+              <h5 className="card-title">Comments</h5>
+              <NewComment />
+              {comments.map(comment => (
+                <Comment
+                  key={comment.id}
+                  username={comment.username}
+                  date={comment.date}
+                  content={comment.content}
+                  onDelete={() => {
+                    this.handleDeleteComment(comment.id);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
