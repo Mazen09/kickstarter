@@ -21,6 +21,13 @@ export async function getComments(postid, lastkey) {
   return client.invokeApi(pathParams, pathTemplate, method, {}, {});
 }
 
+export async function deleteComment(commentid) {
+  var pathParams = { commentid };
+  var pathTemplate = "/comments/{commentid}";
+  var method = "DELETE";
+  return client.invokeApi(pathParams, pathTemplate, method, {}, {});
+}
+
 export function getSearchResults(q, s) {
   var pathParams = { q, s };
   var pathTemplate = "/search?q={q}&s={s}";
