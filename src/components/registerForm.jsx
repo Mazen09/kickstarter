@@ -22,7 +22,8 @@ class RegisterForm extends Form {
     },
     countries: [],
     cities: [],
-    errors: {}
+    errors: {},
+    currentcountryId: ""
   };
 
   schema = {
@@ -78,11 +79,29 @@ class RegisterForm extends Form {
       .label("Password")
   };
 
-  componentDidMount() {
-    const countries = getCountries();
-    const cities = getCities();
-    this.setState({ countries, cities });
+  async componentDidMount() {
+    console.log("getting countries");
+    const { data: countries } = await getCountries();
+    this.setState({ countries });
+    console.log(countries);
   }
+
+  componentDidUpdate() {
+    const { countryId } = this.state.data;
+    const { currentcountryId } = this.state;
+    if (countryId !== currentcountryId) {
+      this.updateCities();
+    }
+    console.log(this.state.data);
+  }
+
+  updateCities = async () => {
+    const { countryId } = this.state.data;
+    const { data: cities } = await getCities(countryId);
+    const currentcountryId = countryId;
+    this.setState({ cities, currentcountryId });
+    // console.log(currentcountryId);
+  };
 
   doSubmit = async () => {
     try {
@@ -107,8 +126,20 @@ class RegisterForm extends Form {
         <form onSubmit={this.handleSubmit}>
           {this.renderInput("firstname", "First name")}
           {this.renderInput("lastname", "Last name")}
-          {this.renderSelect("countryId", "Country", this.state.countries)}
-          {this.renderSelect("cityId", "City", this.state.cities)}
+          {this.renderSelect(
+            "countryId",
+            "Country",
+            this.state.countries,
+            "CountryId",
+            "Name"
+          )}
+          {this.renderSelect(
+            "cityId",
+            "City",
+            this.state.cities,
+            "ZoneId",
+            "Name"
+          )}
           {this.renderInput("address1", "Address1")}
           {this.renderInput("address2", "Address2")}
           {this.renderInput("phone", "Phone Number")}
