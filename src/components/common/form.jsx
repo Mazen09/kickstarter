@@ -83,7 +83,9 @@ class Form extends Component {
     let files = event.target.files;
     const data = { ...this.state.data };
     data[target] = files;
-    this.setState({ data });
+    const UploadingAttachments = true;
+    this.setState({ data, UploadingAttachments });
+    this.uploadAttachments()
   };
 
   renderFileUpload = target => {

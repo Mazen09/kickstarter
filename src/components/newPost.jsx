@@ -2,6 +2,7 @@ import React from "react";
 import Form from "./common/form";
 import Joi from "joi-browser";
 import { getCategories } from "./../services/categoryService";
+import LoadingOverlay from "react-loading-overlay";
 import { ToastContainer } from "react-toastify";
 import Tags from "./tags";
 
@@ -14,7 +15,8 @@ class NewPost extends Form {
       files: {}
     },
     categories: [],
-    errors: {}
+    errors: {},
+    UploadingAttachments: false
   };
 
   schema = {
@@ -33,7 +35,7 @@ class NewPost extends Form {
   componentDidMount() {
     const categories = getCategories();
     this.setState({ categories });
-    console.log(this.state.data.content);
+    // console.log(this.state.data.content);
   }
 
   doSubmit = async () => {
@@ -58,6 +60,8 @@ class NewPost extends Form {
     this.setState({ data });
   };
 
+  uploadAttachments = async () => {};
+
   renderAttachments = () => {
     const items = [];
     const files = this.state.data.files;
@@ -69,7 +73,11 @@ class NewPost extends Form {
 
   render() {
     return (
-      <React.Fragment>
+      <LoadingOverlay
+        active={this.state.UploadingAttachments}
+        spinner
+        text="Uploading Your Attachments..."
+      >
         <div className="container">
           <h1>New Post</h1>
           <div className="row">
@@ -102,7 +110,7 @@ class NewPost extends Form {
             {this.renderCard("content", "Post Output")}
           </div>
         </div>
-      </React.Fragment>
+      </LoadingOverlay>
     );
   }
 }
