@@ -1,6 +1,3 @@
-import http from "./httpService";
-import { apiUrl } from "../config.json";
-
 const categories = [
   { _id: "categoryId", name: "Music" },
   { _id: "1", name: "Programming" },
@@ -11,6 +8,15 @@ const categories = [
 export function getCategories() {
   //   return http.get(apiUrl + "/categories");
   return categories;
+}
+
+export function getExpertCategories(userid) {
+  return [
+    { name: "Music" },
+    { name: "Programming" },
+    { name: "Sport" },
+    { name: "Food" }
+  ];
 }
 
 export function getCategory(id) {

@@ -9,6 +9,7 @@ import NavBar from "./components/navBar";
 import Account from "./components/account";
 import SearchResults from "./components/searchResults";
 import Post from "./components/post";
+import reviewPost from "./components/reviewPost";
 import Logout from "./components/logout";
 import ProtectedRoute from "./components/common/protectedRoute";
 import Review from "./components/review";
@@ -39,6 +40,7 @@ class App extends Component {
         <main className="container">
           <Switch>
             <Route path="/post/:id" component={Post} />
+            <ProtectedRoute path="/reviewPost/:id" component={reviewPost} />
             <Route path="/profile/:user" component={Profile} />
             <Route path="/search/:query" component={SearchResults} />
             <ProtectedRoute path="/account" component={Account} />

@@ -54,6 +54,7 @@ class Home extends Component {
               date={minipost.date}
               category={minipost.category}
               title={minipost.title}
+              type={"reviewPost"}
             />
           ))}
         </div>

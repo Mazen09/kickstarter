@@ -41,3 +41,17 @@ export async function getPost(id) {
   var method = "GET";
   return client.invokeApi(pathParams, pathTemplate, method, {}, {});
 }
+
+export async function getReviewPosts(category, lastkey) {
+  var pathParams;
+  var pathTemplate;
+  if (lastkey === "" || lastkey === null) {
+    pathParams = { category };
+    pathTemplate = "/posts/pending/{category}";
+  } else {
+    pathParams = { category, lastkey };
+    pathTemplate = "/posts/pending/{category}?lastkey={lastkey}";
+  }
+  var method = "GET";
+  return client.invokeApi(pathParams, pathTemplate, method, {}, {});
+}

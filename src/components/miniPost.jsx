@@ -5,12 +5,12 @@ import { Link } from "react-router-dom";
 class MiniPost extends Component {
   state = {};
   render() {
-    const { id, title, username, date, category } = this.props;
+    const { id, title, username, date, category, type } = this.props;
     return (
       <div className="card" style={{ margin: 10 }}>
         <div className="card-body">
           <h4 className="card-title">
-            <Link to={`/post/${id}`}>{title}</Link>{" "}
+            <Link to={`/${type}/${id}`}>{title}</Link>{" "}
             <span className="badge badge-secondary">{category}</span>
           </h4>
           <p className="mb-1 text-muted">

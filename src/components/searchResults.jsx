@@ -58,6 +58,7 @@ class SearchResults extends Component {
               date={minipost.date}
               category={minipost.categoryId}
               title={minipost.title}
+              type={"post"}
             />
           ))}
       </div>

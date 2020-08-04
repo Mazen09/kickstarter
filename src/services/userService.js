@@ -1,8 +1,6 @@
 import http from "./httpService";
 import jwt from "jwt-simple";
-import { apiUrl } from "../config.json";
 
-const apiEndpoint = apiUrl + "/users";
 const secret = "my secret word for encoding :)";
 
 const users = [
