@@ -4,6 +4,7 @@ import Joi from "joi-browser";
 import MiniPost from "./miniPost";
 import { getExpertCategories } from "../services/categoryService";
 import { getReviewPosts } from "./../services/postService";
+import LoadingOverlay from "react-loading-overlay";
 
 class Review extends Form {
   state = {
@@ -14,7 +15,9 @@ class Review extends Form {
     categories: [],
     posts: [],
     lastKey: "",
-    prevCategory: ""
+    prevKey: "none",
+    prevCategory: "",
+    loading: false
   };
 
   schema = {
@@ -26,29 +29,36 @@ class Review extends Form {
   componentDidMount() {
     const categories = getExpertCategories("0");
     this.setState({ categories });
-    document.addEventListener("scroll", this.handleScroll);
-    // console.log(categories);
   }
 
   async componentDidUpdate() {
     const { category } = this.state.data;
-    let { prevCategory } = this.state;
-    console.log("lastkey: ", this.state.lastKey);
-    if (category !== prevCategory) {
-      const lastKey = "";
-      this.setState({ lastKey });
+    let { prevCategory, loading, lastKey, prevKey } = this.state;
+    // console.log("lastkey: ", this.state.lastKey);
+    if (category !== prevCategory && lastKey !== prevKey) {
+      // console.log("category: ", category, "prevcategory: ", prevCategory);
+      loading = true;
+      this.setState({ loading });
       this.updateState(true); // true => reset the posts list
-      prevCategory = category;
-      this.setState({ prevCategory });
+      document.addEventListener("scroll", this.handleScroll);
     }
   }
 
   updateState = async reset => {
-    let { posts, lastKey } = this.state;
+    let { posts, lastKey, prevKey, loading, prevCategory } = this.state;
     let { category } = this.state.data;
+    if (reset) lastKey = "";
+
     const { data } = await getReviewPosts(category, lastKey);
     const { posts: newposts, lastKey: newlastkey } = data;
-    lastKey = newlastkey;
+    console.log(
+      "prev key: ",
+      prevKey,
+      ", lastkey to be called: ",
+      lastKey,
+      ", new lastkey",
+      newlastkey
+    );
     if (reset) {
       posts = newposts;
     } else {
@@ -56,22 +66,28 @@ class Review extends Form {
         posts = posts.concat(newposts);
       }
     }
-    this.setState({ posts, lastKey });
+    prevKey = lastKey;
+    lastKey = newlastkey;
+    prevCategory = category;
+    loading = false;
+    this.setState({ posts, lastKey, prevCategory, loading });
   };
 
   handleScroll = async () => {
     const scrollable =
       document.documentElement.scrollHeight - window.innerHeight;
     const scrolled = window.scrollY;
-    const { lastKey, prevCategory } = this.state;
+    const { lastKey, prevKey, prevCategory } = this.state;
     const { category } = this.state.data;
-    console.log(scrollable, scrolled, lastKey);
     if (
       scrollable - scrolled < 10 &&
       lastKey !== null &&
+      lastKey !== prevKey &&
       category !== "" &&
       category === prevCategory
     ) {
+      console.log(scrollable, scrolled, lastKey);
+      console.log(this.state.posts);
       this.updateState(false); // false => append to the current posts list
     }
     if (lastKey === null) {
@@ -80,23 +96,24 @@ class Review extends Form {
   };
 
   render() {
+    const { posts, categories, loading } = this.state;
     return (
-      <React.Fragment>
+      <LoadingOverlay active={loading} spinner text="Please Wait...">
         <div className="card" style={{ margin: 10 }}>
           <div className="card-body">
             <h4 className="card-title">Choose Category</h4>
-            {console.log(this.state.data.category)}
+            {console.log("posts: ", posts)}
             {this.renderSelect(
               "category",
               "Category",
-              this.state.categories,
+              categories,
               "name",
               "name"
             )}
           </div>
         </div>
         <div className="container" style={{ margin: 10 }}>
-          {this.state.posts.map(minipost => (
+          {posts.map(minipost => (
             <MiniPost
               key={minipost.id}
               id={minipost.id}
@@ -104,10 +121,11 @@ class Review extends Form {
               date={minipost.date}
               category={minipost.category}
               title={minipost.title}
+              type={"reviewPost"}
             />
           ))}
         </div>
-      </React.Fragment>
+      </LoadingOverlay>
     );
   }
 }

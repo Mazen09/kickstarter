@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { getPost, getComments } from "./../services/postService";
+import LoadingOverlay from "react-loading-overlay";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import Tags from "./tags";
@@ -10,15 +11,16 @@ class Post extends Component {
   state = {
     post: {},
     comments: [],
-    lastKey: ""
+    lastKey: "",
+    loading: true
   };
 
   async componentDidMount() {
     console.log("mounting");
     const { id } = this.props.match.params;
     const { data: post } = await getPost(id);
-    this.setState({ post });
     this.updateComments();
+    this.setState({ post, loading: false });
     document.addEventListener("scroll", this.handleScroll);
   }
 
@@ -27,7 +29,7 @@ class Post extends Component {
       document.documentElement.scrollHeight - window.innerHeight;
     const scrolled = window.scrollY;
     const { lastKey } = this.state;
-    console.log(scrollable, scrolled, lastKey);
+    // console.log(scrollable, scrolled, lastKey);
     if (scrollable - scrolled < 10 && lastKey !== null) {
       this.updateComments();
     }
@@ -39,21 +41,21 @@ class Post extends Component {
   updateComments = async () => {
     const { id } = this.state.post;
     let { comments, lastKey } = this.state;
-    console.log("lastkey: ", lastKey);
+    // console.log("lastkey: ", lastKey);
     const { data } = await getComments(id, lastKey);
-    console.log("data: ", data);
+    // console.log("data: ", data);
     const { comments: newComments, lastKey: newlastKey } = data;
     if (lastKey !== newlastKey) {
       comments = comments.concat(newComments);
       lastKey = newlastKey;
       this.setState({ comments, lastKey });
-      console.log("State: ", this.state);
+      // console.log("State: ", this.state);
     }
   };
 
   handleDeleteComment = comment_id => {
     if (confirm("Your comment will be deleted !")) {
-      console.log(comment_id);
+      // console.log(comment_id);
       //TODO delete comment
     }
   };
@@ -80,61 +82,68 @@ class Post extends Component {
       dislikes
     } = this.state.post;
 
-    const { comments } = this.state;
+    const { comments, loading } = this.state;
 
     if (!title) {
       return <React.Fragment></React.Fragment>;
     }
 
     return (
-      <div className="card" style={{ margin: 10 }}>
-        <div className="card-body">
-          <h4 className="card-title">
-            {` ${title} \t`}
-            <span className="badge badge-secondary">{category}</span>
-            <div className="btn-group" role="group" style={{ marginLeft: 20 }}>
-              <button
-                className="btn btn-secondary"
-                onClick={() => this.handleLikes(true)}
+      <LoadingOverlay active={loading} spinner text="Please Wait...">
+        {console.log(loading)}
+        <div className="card" style={{ margin: 10 }}>
+          <div className="card-body">
+            <h4 className="card-title">
+              {` ${title} \t`}
+              <span className="badge badge-secondary">{category}</span>
+              <div
+                className="btn-group"
+                role="group"
+                style={{ marginLeft: 20 }}
               >
-                <i className="fa fa-thumbs-up"></i> {likes}
-              </button>
-              <button
-                className="btn btn-secondary"
-                onClick={() => this.handleLikes(false)}
-              >
-                <i className="fa fa-thumbs-down"></i> {dislikes}
-              </button>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => this.handleLikes(true)}
+                >
+                  <i className="fa fa-thumbs-up"></i> {likes}
+                </button>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => this.handleLikes(false)}
+                >
+                  <i className="fa fa-thumbs-down"></i> {dislikes}
+                </button>
+              </div>
+            </h4>
+            <p className="mb-1 text-muted">
+              by <Link to={`/profile/${username}`}>{username}</Link> at {date}
+            </p>
+            <Tags tags={tags} />
+            <div className="col card">
+              <div className="card-body">
+                <ReactMarkdown source={content} escapeHtml={false} />
+              </div>
             </div>
-          </h4>
-          <p className="mb-1 text-muted">
-            by <Link to={`/profile/${username}`}>{username}</Link> at {date}
-          </p>
-          <Tags tags={tags} />
-          <div className="col card">
-            <div className="card-body">
-              <ReactMarkdown source={content} escapeHtml={false} />
-            </div>
-          </div>
-          <div className="col card">
-            <div className="card-body">
-              <h5 className="card-title">Comments</h5>
-              <NewComment />
-              {comments.map(comment => (
-                <Comment
-                  key={comment.id}
-                  username={comment.username}
-                  date={comment.date}
-                  content={comment.content}
-                  onDelete={() => {
-                    this.handleDeleteComment(comment.id);
-                  }}
-                />
-              ))}
+            <div className="col card">
+              <div className="card-body">
+                <h5 className="card-title">Comments</h5>
+                <NewComment />
+                {comments.map(comment => (
+                  <Comment
+                    key={comment.id}
+                    username={comment.username}
+                    date={comment.date}
+                    content={comment.content}
+                    onDelete={() => {
+                      this.handleDeleteComment(comment.id);
+                    }}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </LoadingOverlay>
     );
   }
 }

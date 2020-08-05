@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Route, Redirect, Switch } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import NewPost from "./components/newPost";
 import Home from "./components/home";
 import NotFound from "./components/notFound";
@@ -15,6 +16,7 @@ import ProtectedRoute from "./components/common/protectedRoute";
 import Review from "./components/review";
 import Profile from "./components/profile";
 import auth from "./services/authService";
+import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import axios from "axios";
 
@@ -24,18 +26,13 @@ class App extends Component {
   async componentDidMount() {
     const user = auth.getCurrentUser();
     this.setState({ user });
-
-    // const promise = axios.get(
-    //   "https://l9wc1bfezc.execute-api.us-east-1.amazonaws.com/Prod/getpost/2315"
-    // );
-    // const response = await promise;
-    // console.log("thE RESPONSE", response);
   }
 
   render() {
     const { user } = this.state;
     return (
       <React.Fragment>
+        <ToastContainer />
         <NavBar user={user} />
         <main className="container">
           <Switch>

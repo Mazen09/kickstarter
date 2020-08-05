@@ -1,10 +1,8 @@
 import React, { Component } from "react";
-import { getPost, getComments } from "./../services/postService";
+import { getPost } from "./../services/postService";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import Tags from "./tags";
-import Comment from "./comment";
-import NewComment from "./newComment";
 
 class reviewPost extends Component {
   state = {
@@ -12,8 +10,8 @@ class reviewPost extends Component {
   };
 
   async componentDidMount() {
-    console.log("mounting");
     const { id } = this.props.match.params;
+    console.log("mounting, id: ", id);
     const { data: post } = await getPost(id);
     this.setState({ post });
   }

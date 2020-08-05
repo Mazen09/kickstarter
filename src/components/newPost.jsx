@@ -3,7 +3,6 @@ import Form from "./common/form";
 import Joi from "joi-browser";
 import { getCategories } from "./../services/categoryService";
 import LoadingOverlay from "react-loading-overlay";
-import { ToastContainer } from "react-toastify";
 import Tags from "./tags";
 
 class NewPost extends Form {
@@ -15,6 +14,7 @@ class NewPost extends Form {
       files: {}
     },
     categories: [],
+    tags: [],
     errors: {},
     UploadingAttachments: false
   };
@@ -40,7 +40,19 @@ class NewPost extends Form {
 
   doSubmit = async () => {
     this.addAttachmentsToContent();
+    this.createTagsList();
     console.log("submitting", this.state);
+  };
+
+  createTagsList = () => {
+    const { tags } = this.state.data;
+    const tagsList = tags
+      .trim()
+      .split(",")
+      .filter(item => {
+        return !(item === "");
+      });
+    this.setState({ tags: tagsList });
   };
 
   addAttachmentsToContent = () => {

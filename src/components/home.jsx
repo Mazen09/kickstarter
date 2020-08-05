@@ -1,11 +1,14 @@
 import React, { Component } from "react";
+import { toast } from "react-toastify";
+import LoadingOverlay from "react-loading-overlay";
 import MiniPost from "./miniPost";
 import { getMiniPosts } from "./../services/postService";
 
 class Home extends Component {
   state = {
     posts: [],
-    lastKey: ""
+    lastKey: "",
+    loading: true
   };
 
   async componentDidMount() {
@@ -18,7 +21,7 @@ class Home extends Component {
       document.documentElement.scrollHeight - window.innerHeight;
     const scrolled = window.scrollY;
     const { lastKey } = this.state;
-    console.log(scrollable, scrolled, lastKey);
+    // console.log(scrollable, scrolled, lastKey);
     if (scrollable - scrolled < 10 && lastKey !== null) {
       this.updateState();
     }
@@ -29,22 +32,23 @@ class Home extends Component {
 
   updateState = async () => {
     let { posts, lastKey } = this.state;
-    console.log("lastkey:", lastKey);
+    let loading = false;
+    // console.log("lastkey:", lastKey);
     const { data } = await getMiniPosts(lastKey);
-    console.log("data", data);
+    // console.log("data", data);
     const { posts: newposts, lastKey: newlastkey } = data;
     if (lastKey !== newlastkey) {
       posts = posts.concat(newposts);
       lastKey = newlastkey;
-      this.setState({ posts, lastKey });
-      console.log(this.state);
+      this.setState({ posts, lastKey, loading });
+      // console.log(this.state);
     }
   };
 
   render() {
-    const { posts } = this.state;
+    const { posts, loading } = this.state;
     return (
-      <React.Fragment>
+      <LoadingOverlay active={loading} spinner text="Please Wait...">
         <div className="container" style={{ margin: 10 }}>
           {posts.map(minipost => (
             <MiniPost
@@ -54,11 +58,11 @@ class Home extends Component {
               date={minipost.date}
               category={minipost.category}
               title={minipost.title}
-              type={"reviewPost"}
+              type={"post"}
             />
           ))}
         </div>
-      </React.Fragment>
+      </LoadingOverlay>
     );
   }
 }
