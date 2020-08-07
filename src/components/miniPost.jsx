@@ -10,7 +10,7 @@ class MiniPost extends Component {
       <div className="card" style={{ margin: 10 }}>
         <div className="card-body">
           <h4 className="card-title">
-            <Link to={`/${type}/${id}`}>{title}</Link>{" "}
+            <Link to={`/${type}/${category}/${id}`}>{title}</Link>{" "}
             <span className="badge badge-secondary">{category}</span>
           </h4>
           <p className="mb-1 text-muted">

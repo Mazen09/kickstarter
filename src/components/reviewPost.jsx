@@ -10,8 +10,8 @@ class reviewPost extends Component {
   };
 
   async componentDidMount() {
-    const { id } = this.props.match.params;
-    console.log("mounting, id: ", id);
+    const { id, category } = this.props.match.params;
+    console.log("mounting, id: ", id, category);
     const { data: post } = await getPost(id);
     this.setState({ post });
   }

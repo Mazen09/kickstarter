@@ -23,7 +23,7 @@ import axios from "axios";
 class App extends Component {
   state = {};
 
-  async componentDidMount() {
+  componentDidMount() {
     const user = auth.getCurrentUser();
     this.setState({ user });
   }
@@ -36,8 +36,11 @@ class App extends Component {
         <NavBar user={user} />
         <main className="container">
           <Switch>
-            <Route path="/post/:id" component={Post} />
-            <ProtectedRoute path="/reviewPost/:id" component={reviewPost} />
+            <Route path="/post/:category/:id" component={Post} />
+            <ProtectedRoute
+              path="/reviewPost/:category/:id"
+              component={reviewPost}
+            />
             <Route path="/profile/:user" component={Profile} />
             <Route path="/search/:query" component={SearchResults} />
             <ProtectedRoute path="/account" component={Account} />

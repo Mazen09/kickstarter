@@ -1,19 +1,29 @@
-import jwtDecode from "jwt-decode";
-import http from "./httpService";
+import client from "./apigService";
+import jwt from "jwt-simple";
+const tokenKey = "user";
 
-const tokenKey = "token";
-
-http.setJwt(getJwt());
-
-export async function login(email, password) {
-  // const { data: jwt } = await http.post(apiEndpoint, { email, password });
-  const jwt =
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmaXJzdG5hbWUiOiJNYXplbiIsImxhc3RuYW1lIjoiRWxtZXNlcnkiLCJjb3VudHJ5SWQiOiI1YjIxY2EzZWViN2Y2ZmJjY2Q0NzE4MTUiLCJjaXR5SWQiOiI1YjIxY2EzZWViN2Y2ZmJjY2Q0NzE4MWIiLCJhZGRyZXNzMSI6IjIzIGJha2VyIHN0cmVldCIsImFkZHJlc3MyIjoiMjMgYmFrZXIgc3RyZWV0IiwicGhvbmUiOiIrMjAxMDk5ODEwODM0IiwidXNlcm5hbWUiOiJtYXplbjA5IiwiZW1haWwiOiJtYXplbmVsbWVzZXJ5QGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiMTIzNDUifQ.usvr0sEegNu4P3uL6pMNcAuPY2ngZ8YHWuxg0AjspNY";
-  localStorage.setItem(tokenKey, jwt);
+export async function login(user) {
+  var body = { ...user };
+  body["password"] = encodePassword(body["password"]);
+  var pathTemplate = "/users";
+  var method = "POST";
+  return client.invokeApi({}, pathTemplate, method, {}, body);
 }
 
-export function loginWithJwt(jwt) {
-  localStorage.setItem(tokenKey, jwt);
+function encodePassword(password) {
+  return jwt.encode(password, process.env.REACT_APP_PASS_ENC_SEC_KEY);
+}
+
+export function register(user) {
+  var body = { ...user };
+  body["password"] = encodePassword(body["password"]);
+  var pathTemplate = "/users";
+  var method = "PUT";
+  return client.invokeApi({}, pathTemplate, method, {}, body);
+}
+
+export function loginWithusername(username) {
+  localStorage.setItem(tokenKey, username);
 }
 
 export function logout() {
@@ -22,21 +32,16 @@ export function logout() {
 
 export function getCurrentUser() {
   try {
-    const jwt = localStorage.getItem(tokenKey);
-    return jwtDecode(jwt);
+    return localStorage.getItem(tokenKey);
   } catch (ex) {
     return null;
   }
 }
 
-export function getJwt() {
-  return localStorage.getItem(tokenKey);
-}
-
 export default {
   login,
-  loginWithJwt,
+  register,
+  loginWithusername,
   logout,
-  getCurrentUser,
-  getJwt
+  getCurrentUser
 };

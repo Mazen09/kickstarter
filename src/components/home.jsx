@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import LoadingOverlay from "react-loading-overlay";
 import MiniPost from "./miniPost";
 import { getMiniPosts } from "./../services/postService";
+import auth from "../services/authService";
 
 class Home extends Component {
   state = {
@@ -13,6 +14,7 @@ class Home extends Component {
 
   async componentDidMount() {
     this.updateState();
+    this.sayHi();
     document.addEventListener("scroll", this.handleScroll);
   }
 
@@ -43,6 +45,13 @@ class Home extends Component {
       this.setState({ posts, lastKey, loading });
       // console.log(this.state);
     }
+  };
+
+  sayHi = () => {
+    const username = auth.getCurrentUser();
+    username
+      ? toast.success(`Welcome ${username}`)
+      : toast.success("Welcome to KickStarter");
   };
 
   render() {

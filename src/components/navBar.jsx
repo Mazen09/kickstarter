@@ -40,7 +40,7 @@ const NavBar = ({ user }) => {
                 Review
               </NavLink>
               <NavLink className="nav-item nav-link" to="/account">
-                {user.username}
+                {user}
               </NavLink>
               <NavLink className="nav-item nav-link" to="/logout">
                 Logout

@@ -85,7 +85,7 @@ class Form extends Component {
     data[target] = files;
     const UploadingAttachments = true;
     this.setState({ data, UploadingAttachments });
-    this.uploadAttachments()
+    this.uploadAttachments();
   };
 
   renderFileUpload = target => {

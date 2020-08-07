@@ -3,11 +3,14 @@ import { Redirect } from "react-router-dom";
 import Joi from "joi-browser";
 import Form from "./common/form";
 import auth from "../services/authService";
+import LoadingOverlay from "react-loading-overlay";
+import { toast } from "react-toastify";
 
 class LoginForm extends Form {
   state = {
     data: { username: "", password: "" },
-    errors: {}
+    errors: {},
+    loading: false
   };
 
   schema = {
@@ -20,33 +23,43 @@ class LoginForm extends Form {
   };
 
   doSubmit = async () => {
-    try {
-      const { data } = this.state;
-      await auth.login(data.username, data.password);
+    this.setState({ loading: true });
+    this.login();
+  };
 
+  login = async () => {
+    const { data } = this.state;
+    try {
+      await auth.login(data);
+      auth.loginWithusername(data.username);
       const { state } = this.props.location;
+      this.setState({ loading: false });
       window.location = state ? state.from.pathname : "/";
     } catch (ex) {
-      if (ex.response && ex.response.status === 400) {
+      this.setState({ loading: false });
+      if (ex.response && ex.response.status === 404) {
         const errors = { ...this.state.errors };
         errors.username = ex.response.data;
         this.setState({ errors });
+        toast.error("User not found. Please register instead");
       }
     }
   };
 
   render() {
     if (auth.getCurrentUser()) return <Redirect to="/" />;
-
+    const { loading } = this.state;
     return (
-      <div>
-        <h1>Login</h1>
-        <form onSubmit={this.handleSubmit}>
-          {this.renderInput("username", "Username")}
-          {this.renderInput("password", "Password", "password")}
-          {this.renderButton("Login")}
-        </form>
-      </div>
+      <LoadingOverlay active={loading} spinner text="Please Wait...">
+        <div>
+          <h1>Login</h1>
+          <form onSubmit={this.handleSubmit}>
+            {this.renderInput("username", "Username")}
+            {this.renderInput("password", "Password", "password")}
+            {this.renderButton("Login")}
+          </form>
+        </div>
+      </LoadingOverlay>
     );
   }
 }
