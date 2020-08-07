@@ -55,3 +55,10 @@ export async function getReviewPosts(category, lastkey) {
   var method = "GET";
   return client.invokeApi(pathParams, pathTemplate, method, {}, {});
 }
+
+export async function addComment(data) {
+  var body = { data };
+  var pathTemplate = "/users";
+  var method = "PUT";
+  return client.invokeApi({}, pathTemplate, method, {}, body);
+}

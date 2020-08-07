@@ -1,28 +1,78 @@
-import React, { Component } from "react";
-import { getPost, getComments } from "./../services/postService";
+import React from "react";
+import Joi from "joi-browser";
+import auth from "../services/authService";
+import Form from "./common/form";
+import { getPost, getComments, addComment } from "./../services/postService";
 import LoadingOverlay from "react-loading-overlay";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import Tags from "./tags";
 import Comment from "./comment";
-import NewComment from "./newComment";
+import { toast } from "react-toastify";
 
-class Post extends Component {
+class Post extends Form {
   state = {
+    data: {
+      comment: ""
+    },
+    errors: {},
     post: {},
     comments: [],
     lastKey: "",
     loading: true
   };
 
+  schema = {
+    comment: Joi.string()
+      .required()
+      .label("Comment")
+  };
+
+  doSubmit = async () => {
+    const username = auth.getCurrentUser();
+    const { id } = this.props.match.params;
+    const { comment } = this.state.data;
+    const data = {
+      username: username,
+      postid: id,
+      content: comment
+    };
+    console.log(data);
+    try {
+      await addComment(data);
+    } catch (error) {
+      toast.error("error in new comment");
+    }
+    this.loadComments("");
+  };
+
   async componentDidMount() {
     console.log("mounting");
     const { id } = this.props.match.params;
     const { data: post } = await getPost(id);
-    this.updateComments();
+    this.loadComments("");
     this.setState({ post, loading: false });
     document.addEventListener("scroll", this.handleScroll);
   }
+
+  loadComments = async key => {
+    try {
+      const { id } = this.state.post;
+      let { comments, lastKey } = this.state;
+      // console.log("lastkey: ", lastKey);
+      const { data } = await getComments(id, key);
+      // console.log("data: ", data);
+      const { comments: newComments, lastKey: newlastKey } = data;
+      if (lastKey !== newlastKey) {
+        comments = comments.concat(newComments);
+        lastKey = newlastKey;
+        this.setState({ comments, lastKey });
+        // console.log("State: ", this.state);
+      }
+    } catch (ex) {
+      toast.error("error");
+    }
+  };
 
   handleScroll = async () => {
     const scrollable =
@@ -38,26 +88,8 @@ class Post extends Component {
     }
   };
 
-  updateComments = async () => {
-    const { id } = this.state.post;
-    let { comments, lastKey } = this.state;
-    // console.log("lastkey: ", lastKey);
-    const { data } = await getComments(id, lastKey);
-    // console.log("data: ", data);
-    const { comments: newComments, lastKey: newlastKey } = data;
-    if (lastKey !== newlastKey) {
-      comments = comments.concat(newComments);
-      lastKey = newlastKey;
-      this.setState({ comments, lastKey });
-      // console.log("State: ", this.state);
-    }
-  };
-
-  handleDeleteComment = comment_id => {
-    if (confirm("Your comment will be deleted !")) {
-      // console.log(comment_id);
-      //TODO delete comment
-    }
+  updateComments = () => {
+    this.loadComments(this.state.lastKey);
   };
 
   handleLikes = b => {
@@ -83,6 +115,7 @@ class Post extends Component {
     } = this.state.post;
 
     const { comments, loading } = this.state;
+    const user = auth.getCurrentUser();
 
     if (!title) {
       return <React.Fragment></React.Fragment>;
@@ -90,7 +123,6 @@ class Post extends Component {
 
     return (
       <LoadingOverlay active={loading} spinner text="Please Wait...">
-        {console.log(loading)}
         <div className="card" style={{ margin: 10 }}>
           <div className="card-body">
             <h4 className="card-title">
@@ -127,7 +159,21 @@ class Post extends Component {
             <div className="col card">
               <div className="card-body">
                 <h5 className="card-title">Comments</h5>
-                <NewComment />
+                {auth.getCurrentUser() && (
+                  <div className="col card">
+                    <div className="card-body">
+                      <h6 className="card-title">Write comment as {user}</h6>
+                      <form onSubmit={this.handleSubmit}>
+                        {this.renderTextarea(
+                          "comment",
+                          "write your comment here",
+                          "2"
+                        )}
+                        {this.renderButton("Submit")}
+                      </form>
+                    </div>
+                  </div>
+                )}
                 {comments.map(comment => (
                   <Comment
                     key={comment.id}

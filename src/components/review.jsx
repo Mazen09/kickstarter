@@ -5,6 +5,7 @@ import MiniPost from "./miniPost";
 import { getExpertCategories } from "../services/categoryService";
 import { getReviewPosts } from "./../services/postService";
 import LoadingOverlay from "react-loading-overlay";
+import auth from "../services/authService";
 
 class Review extends Form {
   state = {
@@ -26,17 +27,15 @@ class Review extends Form {
       .label("Category")
   };
 
-  componentDidMount() {
-    const categories = getExpertCategories("0");
-    this.setState({ categories });
+  async componentDidMount() {
+    const { data } = await getExpertCategories(auth.getCurrentUser());
+    this.setState({ categories: data });
   }
 
   async componentDidUpdate() {
     const { category } = this.state.data;
     let { prevCategory, loading, lastKey, prevKey } = this.state;
-    // console.log("lastkey: ", this.state.lastKey);
     if (category !== prevCategory && lastKey !== prevKey) {
-      // console.log("category: ", category, "prevcategory: ", prevCategory);
       loading = true;
       this.setState({ loading });
       this.updateState(true); // true => reset the posts list
@@ -51,14 +50,14 @@ class Review extends Form {
 
     const { data } = await getReviewPosts(category, lastKey);
     const { posts: newposts, lastKey: newlastkey } = data;
-    console.log(
-      "prev key: ",
-      prevKey,
-      ", lastkey to be called: ",
-      lastKey,
-      ", new lastkey",
-      newlastkey
-    );
+    // console.log(
+    //   "prev key: ",
+    //   prevKey,
+    //   ", lastkey to be called: ",
+    //   lastKey,
+    //   ", new lastkey",
+    //   newlastkey
+    // );
     if (reset) {
       posts = newposts;
     } else {
@@ -86,8 +85,8 @@ class Review extends Form {
       category !== "" &&
       category === prevCategory
     ) {
-      console.log(scrollable, scrolled, lastKey);
-      console.log(this.state.posts);
+      // console.log(scrollable, scrolled, lastKey);
+      // console.log(this.state.posts);
       this.updateState(false); // false => append to the current posts list
     }
     if (lastKey === null) {
@@ -102,16 +101,19 @@ class Review extends Form {
         <div className="card" style={{ margin: 10 }}>
           <div className="card-body">
             <h4 className="card-title">Choose Category</h4>
-            {console.log("posts: ", posts)}
+            {/* {console.log("posts: ", posts)} */}
             {this.renderSelect(
               "category",
               "Category",
               categories,
-              "name",
-              "name"
+              "Category",
+              "Category"
             )}
           </div>
         </div>
+        {posts.length === 0 && this.state.data.category !== "" && (
+          <h4>No avillable posts for that category</h4>
+        )}
         <div className="container" style={{ margin: 10 }}>
           {posts.map(minipost => (
             <MiniPost

@@ -14,7 +14,7 @@ function encodePassword(password) {
   return jwt.encode(password, process.env.REACT_APP_PASS_ENC_SEC_KEY);
 }
 
-export function register(user) {
+export async function register(user) {
   var body = { ...user };
   body["password"] = encodePassword(body["password"]);
   var pathTemplate = "/users";
@@ -38,10 +38,26 @@ export function getCurrentUser() {
   }
 }
 
+export async function getAccount(username) {
+  var pathParams = { username };
+  var pathTemplate = "/users/account?username={username}";
+  var method = "GET";
+  return client.invokeApi(pathParams, pathTemplate, method, {}, {});
+}
+
+export async function getProfile(username) {
+  var pathParams = { username };
+  var pathTemplate = "/users/{username}";
+  var method = "GET";
+  return client.invokeApi(pathParams, pathTemplate, method, {}, {});
+}
+
 export default {
   login,
   register,
   loginWithusername,
   logout,
-  getCurrentUser
+  getCurrentUser,
+  getAccount,
+  getProfile
 };

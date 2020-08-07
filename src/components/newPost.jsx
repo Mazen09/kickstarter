@@ -1,7 +1,7 @@
 import React from "react";
 import Form from "./common/form";
 import Joi from "joi-browser";
-import { getCategories } from "./../services/categoryService";
+import { getCategories, turnToObjectList } from "./../services/categoryService";
 import LoadingOverlay from "react-loading-overlay";
 import Tags from "./tags";
 
@@ -9,7 +9,7 @@ class NewPost extends Form {
   state = {
     data: {
       content: "",
-      categoryId: "",
+      category: "",
       tags: "",
       files: {}
     },
@@ -23,7 +23,7 @@ class NewPost extends Form {
     content: Joi.string()
       .required()
       .label("Content"),
-    categoryId: Joi.string()
+    category: Joi.string()
       .required()
       .label("Category"),
     tags: Joi.string()
@@ -32,10 +32,11 @@ class NewPost extends Form {
     files: Joi.label("Files")
   };
 
-  componentDidMount() {
-    const categories = getCategories();
+  async componentDidMount() {
+    const { data } = await getCategories();
+    const categories = turnToObjectList(data);
     this.setState({ categories });
-    // console.log(this.state.data.content);
+    console.log("mounted !!");
   }
 
   doSubmit = async () => {
@@ -84,6 +85,7 @@ class NewPost extends Form {
   };
 
   render() {
+    const { categories } = this.state;
     return (
       <LoadingOverlay
         active={this.state.UploadingAttachments}
@@ -98,9 +100,11 @@ class NewPost extends Form {
                 <h4 className="card-title">Post Editor</h4>
                 <form onSubmit={this.handleSubmit}>
                   {this.renderSelect(
-                    "categoryId",
+                    "category",
                     "Category",
-                    this.state.categories
+                    categories,
+                    "name",
+                    "name"
                   )}
                   {this.renderInput("tags", "Tags (comma separated)")}
                   {this.renderTextarea(
