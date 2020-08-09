@@ -35,10 +35,24 @@ export function getSearchResults(q, s) {
   return client.invokeApi(pathParams, pathTemplate, method, {}, {});
 }
 
-export async function getPost(id) {
-  var pathParams = { postId: id };
+export async function getPost(postId) {
+  var pathParams = { postId };
   var pathTemplate = "/posts/{postId}";
   var method = "GET";
+  return client.invokeApi(pathParams, pathTemplate, method, {}, {});
+}
+
+export async function getReviewPost(category, postid) {
+  var pathParams = { category, postid };
+  var pathTemplate = "/posts/pending/{category}/{postid}";
+  var method = "GET";
+  return client.invokeApi(pathParams, pathTemplate, method, {}, {});
+}
+
+export async function approvePost(category, postid) {
+  var pathParams = { category, postid };
+  var pathTemplate = "/posts/pending/{category}/{postid}";
+  var method = "POST";
   return client.invokeApi(pathParams, pathTemplate, method, {}, {});
 }
 

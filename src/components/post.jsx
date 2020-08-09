@@ -57,7 +57,7 @@ class Post extends Form {
 
   loadComments = async key => {
     try {
-      const { id } = this.state.post;
+      const { id } = this.props.match.params;
       let { comments, lastKey } = this.state;
       // console.log("lastkey: ", lastKey);
       const { data } = await getComments(id, key);
