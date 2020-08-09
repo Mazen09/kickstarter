@@ -15,7 +15,7 @@ class Comment extends Component {
           </h5>
           <p className="mb-1 text-muted">at {date}</p>
           <p>{content}</p>
-          {current_user && current_user.username === username && (
+          {current_user && current_user === username && (
             <button
               className="btn btn-danger"
               onClick={() => {

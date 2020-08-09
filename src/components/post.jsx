@@ -2,7 +2,12 @@ import React from "react";
 import Joi from "joi-browser";
 import auth from "../services/authService";
 import Form from "./common/form";
-import { getPost, getComments, addComment } from "./../services/postService";
+import { getPost } from "./../services/postService";
+import {
+  getComments,
+  addComment,
+  deleteComment
+} from "./../services/commentService";
 import LoadingOverlay from "react-loading-overlay";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
@@ -29,21 +34,31 @@ class Post extends Form {
   };
 
   doSubmit = async () => {
+    this.setState({ loading: true });
     const username = auth.getCurrentUser();
     const { id } = this.props.match.params;
     const { comment } = this.state.data;
-    const data = {
-      username: username,
-      postid: id,
-      content: comment
-    };
-    console.log(data);
     try {
-      await addComment(data);
+      await addComment(username, id, comment);
+      toast.success("your comment is added successfully.");
+      this.loadComments("");
     } catch (error) {
-      toast.error("error in new comment");
+      console.log(error);
+      toast.error("counldn't add your comment. Please try again later.");
     }
-    this.loadComments("");
+  };
+
+  handleDeleteComment = async commentid => {
+    this.setState({ loading: true });
+    const username = auth.getCurrentUser();
+    try {
+      await deleteComment(commentid, username);
+      toast.success("your comment is deleted successfully.");
+      this.loadComments("");
+    } catch (error) {
+      console.log(error);
+      toast.error("counldn't delete your comment. Please try again later.");
+    }
   };
 
   async componentDidMount() {
@@ -52,23 +67,26 @@ class Post extends Form {
     const { data: post } = await getPost(id);
     this.loadComments("");
     this.setState({ post, loading: false });
-    document.addEventListener("scroll", this.handleScroll);
   }
 
   loadComments = async key => {
+    console.log("loading comments ...");
     try {
       const { id } = this.props.match.params;
       let { comments, lastKey } = this.state;
-      // console.log("lastkey: ", lastKey);
+      console.log("lastkey: ", lastKey);
       const { data } = await getComments(id, key);
-      // console.log("data: ", data);
+      console.log("data: ", data);
       const { comments: newComments, lastKey: newlastKey } = data;
-      if (lastKey !== newlastKey) {
+      if (key === "") {
+        comments = newComments;
+        document.addEventListener("scroll", this.handleScroll);
+      } else if (lastKey !== newlastKey) {
         comments = comments.concat(newComments);
-        lastKey = newlastKey;
-        this.setState({ comments, lastKey });
-        // console.log("State: ", this.state);
       }
+      lastKey = newlastKey;
+      this.setState({ comments, lastKey, loading: false });
+      console.log("State: ", this.state);
     } catch (ex) {
       toast.error("error");
     }
