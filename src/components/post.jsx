@@ -157,24 +157,26 @@ class Post extends Form {
             <h4 className="card-title">
               {` ${title} \t`}
               <span className="badge badge-secondary">{category}</span>
-              <div
-                className="btn-group"
-                role="group"
-                style={{ marginLeft: 20 }}
-              >
-                <button
-                  className={likeButtonClass}
-                  onClick={() => this.handleLikes(true)}
+              {user && (
+                <div
+                  className="btn-group"
+                  role="group"
+                  style={{ marginLeft: 20 }}
                 >
-                  <i className="fa fa-thumbs-up"></i>
-                </button>
-                <button
-                  className={dislikeButtonClass}
-                  onClick={() => this.handleLikes(false)}
-                >
-                  <i className="fa fa-thumbs-down"></i>
-                </button>
-              </div>
+                  <button
+                    className={likeButtonClass}
+                    onClick={() => this.handleLikes(true)}
+                  >
+                    <i className="fa fa-thumbs-up"></i>
+                  </button>
+                  <button
+                    className={dislikeButtonClass}
+                    onClick={() => this.handleLikes(false)}
+                  >
+                    <i className="fa fa-thumbs-down"></i>
+                  </button>
+                </div>
+              )}
             </h4>
             <p className="mb-1 text-muted">
               by <Link to={`/profile/${username}`}>{username}</Link> at {date}
