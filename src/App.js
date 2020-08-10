@@ -6,7 +6,7 @@ import Home from "./components/home";
 import NotFound from "./components/notFound";
 import RegisterForm from "./components/registerForm";
 import LoginForm from "./components/loginForm";
-import NavBar from "./components/navBar";
+import NavBar from "./components/common/navBar";
 import Account from "./components/account";
 import SearchResults from "./components/searchResults";
 import Post from "./components/post";

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { getSearchResults } from "../services/postService";
-import MiniPost from "./miniPost";
+import MiniPost from "./common/miniPost";
 
 class SearchResults extends Component {
   state = {

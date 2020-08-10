@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import auth from "../services/authService";
+import auth from "../../services/authService";
 
 class Comment extends Component {
   state = {};

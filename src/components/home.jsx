@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { toast } from "react-toastify";
 import LoadingOverlay from "react-loading-overlay";
-import MiniPost from "./miniPost";
+import MiniPost from "./common/miniPost";
 import { getMiniPosts } from "./../services/postService";
 import auth from "../services/authService";
 

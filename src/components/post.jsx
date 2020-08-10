@@ -2,7 +2,7 @@ import React from "react";
 import Joi from "joi-browser";
 import auth from "../services/authService";
 import Form from "./common/form";
-import { getPost } from "./../services/postService";
+import { getPost, getvote, vote } from "./../services/postService";
 import {
   getComments,
   addComment,
@@ -11,8 +11,8 @@ import {
 import LoadingOverlay from "react-loading-overlay";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-import Tags from "./tags";
-import Comment from "./comment";
+import Tags from "./common/tags";
+import Comment from "./common/comment";
 import { toast } from "react-toastify";
 
 class Post extends Form {
@@ -24,7 +24,8 @@ class Post extends Form {
     post: {},
     comments: [],
     lastKey: "",
-    loading: true
+    loading: true,
+    vote: "none"
   };
 
   schema = {
@@ -32,6 +33,16 @@ class Post extends Form {
       .required()
       .label("Comment")
   };
+
+  async componentDidMount() {
+    console.log("mounting");
+    const { id } = this.props.match.params;
+    const username = auth.getCurrentUser();
+    const { data: post } = await getPost(id);
+    const { data: vote } = await getvote(id, username);
+    this.loadComments("");
+    this.setState({ post, loading: false, vote });
+  }
 
   doSubmit = async () => {
     this.setState({ loading: true });
@@ -61,22 +72,14 @@ class Post extends Form {
     }
   };
 
-  async componentDidMount() {
-    console.log("mounting");
-    const { id } = this.props.match.params;
-    const { data: post } = await getPost(id);
-    this.loadComments("");
-    this.setState({ post, loading: false });
-  }
-
   loadComments = async key => {
     console.log("loading comments ...");
     try {
       const { id } = this.props.match.params;
       let { comments, lastKey } = this.state;
-      console.log("lastkey: ", lastKey);
+      // console.log("lastkey: ", lastKey);
       const { data } = await getComments(id, key);
-      console.log("data: ", data);
+      // console.log("data: ", data);
       const { comments: newComments, lastKey: newlastKey } = data;
       if (key === "") {
         comments = newComments;
@@ -86,7 +89,7 @@ class Post extends Form {
       }
       lastKey = newlastKey;
       this.setState({ comments, lastKey, loading: false });
-      console.log("State: ", this.state);
+      // console.log("State: ", this.state);
     } catch (ex) {
       toast.error("error");
     }
@@ -111,29 +114,37 @@ class Post extends Form {
   };
 
   handleLikes = b => {
-    const post = this.state.post;
+    const cur_vote = this.state.vote;
     if (b) {
-      post.likes = parseInt(post.likes) + 1;
+      this.setState({ vote: "up" });
+      this.doVote("up", cur_vote);
     } else {
-      post.dislikes = parseInt(post.dislikes) + 1;
+      this.setState({ vote: "down" });
+      this.doVote("down", cur_vote);
     }
-    this.setState({ post });
+  };
+
+  doVote = async (v, cur_vote) => {
+    const { id } = this.props.match.params;
+    const username = auth.getCurrentUser();
+    try {
+      await vote(id, username, v);
+      toast.success("Your vote is recorded successfully.");
+    } catch (error) {
+      toast.error("Couldn't record your vote.");
+      this.setState({ vote: cur_vote });
+    }
   };
 
   render() {
-    const {
-      title,
-      username,
-      date,
-      category,
-      tags,
-      content,
-      likes,
-      dislikes
-    } = this.state.post;
+    const { title, username, date, category, tags, content } = this.state.post;
 
-    const { comments, loading } = this.state;
+    const { comments, loading, vote } = this.state;
     const user = auth.getCurrentUser();
+    const likeButtonClass =
+      vote === "up" ? "btn btn-success" : "btn btn-secondary";
+    const dislikeButtonClass =
+      vote === "down" ? "btn btn-danger" : "btn btn-secondary";
 
     if (!title) {
       return <React.Fragment></React.Fragment>;
@@ -152,16 +163,16 @@ class Post extends Form {
                 style={{ marginLeft: 20 }}
               >
                 <button
-                  className="btn btn-secondary"
+                  className={likeButtonClass}
                   onClick={() => this.handleLikes(true)}
                 >
-                  <i className="fa fa-thumbs-up"></i> {likes}
+                  <i className="fa fa-thumbs-up"></i>
                 </button>
                 <button
-                  className="btn btn-secondary"
+                  className={dislikeButtonClass}
                   onClick={() => this.handleLikes(false)}
                 >
-                  <i className="fa fa-thumbs-down"></i> {dislikes}
+                  <i className="fa fa-thumbs-down"></i>
                 </button>
               </div>
             </h4>

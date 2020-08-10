@@ -3,7 +3,7 @@ import Form from "./common/form";
 import Joi from "joi-browser";
 import { getCategories, turnToObjectList } from "./../services/categoryService";
 import LoadingOverlay from "react-loading-overlay";
-import Tags from "./tags";
+import Tags from "./common/tags";
 
 class NewPost extends Form {
   state = {

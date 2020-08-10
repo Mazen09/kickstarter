@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import LoadingOverlay from "react-loading-overlay";
 import { toast } from "react-toastify";
-import Tags from "./tags";
+import Tags from "./common/tags";
 
 class reviewPost extends Component {
   state = {

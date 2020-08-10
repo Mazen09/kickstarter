@@ -1,7 +1,7 @@
 import React from "react";
 import Form from "./common/form";
 import Joi from "joi-browser";
-import MiniPost from "./miniPost";
+import MiniPost from "./common/miniPost";
 import { getExpertCategories } from "../services/categoryService";
 import { getReviewPosts } from "./../services/postService";
 import LoadingOverlay from "react-loading-overlay";

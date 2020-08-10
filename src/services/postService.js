@@ -21,6 +21,21 @@ export async function getPost(postId) {
   return client.invokeApi(pathParams, pathTemplate, method, {}, {});
 }
 
+export async function getvote(postId, username) {
+  var pathParams = { postId, username };
+  var pathTemplate = "/posts/{postId}/votes?username={username}";
+  var method = "GET";
+  return client.invokeApi(pathParams, pathTemplate, method, {}, {});
+}
+
+export async function vote(postId, username, vote) {
+  var pathParams = { postId, username, vote };
+  var pathTemplate =
+    "/posts/{postId}/votes?username={username}&direction={vote}";
+  var method = "POST";
+  return client.invokeApi(pathParams, pathTemplate, method, {}, {});
+}
+
 export async function getReviewPost(category, postid) {
   var pathParams = { category, postid };
   var pathTemplate = "/posts/pending/{category}/{postid}";
