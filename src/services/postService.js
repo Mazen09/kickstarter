@@ -1,4 +1,5 @@
 import client from "./apigService";
+import axios from "axios";
 
 export async function getMiniPosts(lastkey) {
   var pathParams = { lastkey };
@@ -19,6 +20,21 @@ export async function getPost(postId) {
   var pathTemplate = "/posts/{postId}";
   var method = "GET";
   return client.invokeApi(pathParams, pathTemplate, method, {}, {});
+}
+
+export async function getPresignedURL() {
+  var pathTemplate = "/utils/presignedurls";
+  var method = "GET";
+  return client.invokeApi({}, pathTemplate, method, {}, {});
+}
+
+export async function uploadFile(file, url) {
+  console.log(file, url);
+  var options = {
+    headers: { "Content-Type": file["type"], "x-amz-acl": "public-read" }
+  };
+  console.log("options", options);
+  return axios.put(url, file, options);
 }
 
 export async function getvote(postId, username) {

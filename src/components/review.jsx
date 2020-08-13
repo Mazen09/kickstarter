@@ -29,6 +29,7 @@ class Review extends Form {
 
   async componentDidMount() {
     const { data } = await getExpertCategories(auth.getCurrentUser());
+    console.log(data);
     this.setState({ categories: data });
   }
 

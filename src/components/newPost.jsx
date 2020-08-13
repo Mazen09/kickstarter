@@ -4,6 +4,8 @@ import Joi from "joi-browser";
 import { getCategories, turnToObjectList } from "./../services/categoryService";
 import LoadingOverlay from "react-loading-overlay";
 import Tags from "./common/tags";
+import { getPresignedURL, uploadFile } from "../services/postService";
+import { toast } from "react-toastify";
 
 class NewPost extends Form {
   state = {
@@ -15,6 +17,7 @@ class NewPost extends Form {
     },
     categories: [],
     tags: [],
+    attachments: [],
     errors: {},
     UploadingAttachments: false
   };
@@ -73,7 +76,32 @@ class NewPost extends Form {
     this.setState({ data });
   };
 
-  uploadAttachments = async () => {};
+  uploadAttachments = async () => {
+    try {
+      let { data: presignedurl } = await getPresignedURL();
+      console.log(this.state.data.files, presignedurl);
+      Array.from(this.state.data.files).forEach(file => {
+        let url = this.putFilenameToURL(presignedurl, file.name);
+        console.log(file.name, url);
+        this.uploadFile(file, url);
+      });
+    } catch (error) {
+      toast.error("Couldn't Upload your attachments. Please try again later");
+    }
+    this.setState({ UploadingAttachments: false });
+  };
+
+  uploadFile = async (file, url) => {
+    try {
+      await uploadFile(file, url);
+    } catch (error) {
+      console.log("ERROR: ", error);
+    }
+  };
+
+  putFilenameToURL = (url, name) => {
+    return url.replace("%7Bfilename%7D", name.replace(/ /g, ""));
+  };
 
   renderAttachments = () => {
     const items = [];
@@ -86,11 +114,12 @@ class NewPost extends Form {
 
   render() {
     const { categories } = this.state;
+    console.log(this.state.data.files);
     return (
       <LoadingOverlay
         active={this.state.UploadingAttachments}
         spinner
-        text="Uploading Your Attachments..."
+        text="Please wait ..."
       >
         <div className="container">
           <h1>New Post</h1>

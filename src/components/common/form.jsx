@@ -4,7 +4,6 @@ import Input from "./input";
 import Textarea from "./textarea";
 import Select from "./select";
 import ReactMarkdown from "react-markdown";
-import { toast } from "react-toastify";
 
 class Form extends Component {
   state = {
@@ -51,11 +50,9 @@ class Form extends Component {
   };
 
   onFileUploadChangeHandler = (event, target) => {
-    console.log(target);
-    if (this.filesSizeCheck(event)) {
-      console.log(event.target.files);
-      this.addFilesToTarget(target);
-    }
+    // console.log(target);
+    // console.log(event.target.files);
+    this.addFilesToTarget(target);
   };
 
   filesSizeCheck = event => {
@@ -83,8 +80,7 @@ class Form extends Component {
     let files = event.target.files;
     const data = { ...this.state.data };
     data[target] = files;
-    const UploadingAttachments = true;
-    this.setState({ data, UploadingAttachments });
+    this.setState({ data, UploadingAttachments: true });
     this.uploadAttachments();
   };
 
