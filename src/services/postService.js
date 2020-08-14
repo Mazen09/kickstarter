@@ -41,6 +41,7 @@ export async function uploadFile(file) {
     Bucket: "kickstarter-attachments",
     Key: v4(),
     Body: file,
+    ContentType: file["type"],
   };
   return s3.upload(params).promise();
 }
