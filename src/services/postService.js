@@ -1,5 +1,7 @@
 import client from "./apigService";
 import axios from "axios";
+import * as AWS from "aws-sdk";
+import v4 from "uuid";
 
 export async function getMiniPosts(lastkey) {
   var pathParams = { lastkey };
@@ -29,13 +31,18 @@ export async function getPresignedURL(filename) {
   return client.invokeApi(pathParams, pathTemplate, method, {}, {});
 }
 
-export async function uploadFile(file, url) {
-  console.log(file, url);
-  var options = {
-    headers: { "Content-Type": file["type"], "x-amz-acl": "public-read" }
-  }; // I tried to add these headers to the request but doesn't work :(
-  console.log("options", options);
-  return axios.put(url, file);
+export async function uploadFile(file) {
+  const s3 = new AWS.S3({
+    accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+    region: "us-east-1",
+  });
+  const params = {
+    Bucket: "kickstarter-attachments",
+    Key: v4(),
+    Body: file,
+  };
+  return s3.upload(params).promise();
 }
 
 export async function getvote(postId, username) {

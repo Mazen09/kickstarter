@@ -88,10 +88,11 @@ class NewPost extends Form {
   };
 
   uploadFile = async file => {
-    let { data: presignedurl } = await getPresignedURL(
-      file.name.replace(/ /g, "") //remove spaces from file name
-    );
-    await uploadFile(file, presignedurl);
+    uploadFile(file).then(res => {
+      console.log(res)
+    }).catch(err => {
+      console.log(err)
+    })
   };
 
   putFilenameToURL = (url, name) => {
