@@ -12,8 +12,7 @@ class NewPost extends Form {
     data: {
       content: "",
       category: "",
-      tags: "",
-      files: {}
+      tags: ""
     },
     categories: [],
     tags: [],
@@ -76,45 +75,40 @@ class NewPost extends Form {
     this.setState({ data });
   };
 
-  uploadAttachments = async () => {
+  uploadAttachments = async files => {
     try {
-      let { data: presignedurl } = await getPresignedURL();
-      console.log(this.state.data.files, presignedurl);
-      Array.from(this.state.data.files).forEach(file => {
-        let url = this.putFilenameToURL(presignedurl, file.name);
-        console.log(file.name, url);
-        this.uploadFile(file, url);
+      Array.from(files).forEach(file => {
+        this.uploadFile(file);
       });
     } catch (error) {
+      console.log(error);
       toast.error("Couldn't Upload your attachments. Please try again later");
     }
     this.setState({ UploadingAttachments: false });
   };
 
-  uploadFile = async (file, url) => {
-    try {
-      await uploadFile(file, url);
-    } catch (error) {
-      console.log("ERROR: ", error);
-    }
+  uploadFile = async file => {
+    let { data: presignedurl } = await getPresignedURL(
+      file.name.replace(/ /g, "") //remove spaces from file name
+    );
+    await uploadFile(file, presignedurl);
   };
 
   putFilenameToURL = (url, name) => {
-    return url.replace("%7Bfilename%7D", name.replace(/ /g, ""));
+    return url.replace("%7Bfilename%7D", name.replace(/ /g, "")); //remove spaces from file name
   };
 
   renderAttachments = () => {
     const items = [];
-    const files = this.state.data.files;
-    for (var x = 0; x < files.length; x++) {
-      items.push(files[x].name);
+    const { attachments } = this.state;
+    for (var x = 0; x < attachments.length; x++) {
+      items.push(attachments[x].name);
     }
     return <Tags tags={items} />;
   };
 
   render() {
     const { categories } = this.state;
-    console.log(this.state.data.files);
     return (
       <LoadingOverlay
         active={this.state.UploadingAttachments}

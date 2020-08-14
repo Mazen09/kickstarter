@@ -52,37 +52,38 @@ class Form extends Component {
   onFileUploadChangeHandler = (event, target) => {
     // console.log(target);
     // console.log(event.target.files);
-    this.addFilesToTarget(target);
+    // this.addFilesToTarget(target);
+    this.uploadAttachments(event.target.files);
   };
 
-  filesSizeCheck = event => {
-    let files = event.target.files;
-    let err = "";
-    let maxSize = 5250880; //about 5MB
-    let size = 0;
-    for (var x = 0; x < files.length; x++) {
-      size += files[x].size;
-      if (size >= maxSize) {
-        err = "Max size exceeded";
-        break;
-      }
-    }
-    if (err !== "") {
-      event.target.value = null;
-      console.log(err);
-      alert(err);
-      return false;
-    }
-    return true;
-  };
+  // filesSizeCheck = event => {
+  //   let files = event.target.files;
+  //   let err = "";
+  //   let maxSize = 5250880; //about 5MB
+  //   let size = 0;
+  //   for (var x = 0; x < files.length; x++) {
+  //     size += files[x].size;
+  //     if (size >= maxSize) {
+  //       err = "Max size exceeded";
+  //       break;
+  //     }
+  //   }
+  //   if (err !== "") {
+  //     event.target.value = null;
+  //     console.log(err);
+  //     alert(err);
+  //     return false;
+  //   }
+  //   return true;
+  // };
 
-  addFilesToTarget = target => {
-    let files = event.target.files;
-    const data = { ...this.state.data };
-    data[target] = files;
-    this.setState({ data, UploadingAttachments: true });
-    this.uploadAttachments();
-  };
+  // addFilesToTarget = target => {
+  //   let files = event.target.files;
+  //   const data = { ...this.state.data };
+  //   data[target] = files;
+  //   this.setState({ data, UploadingAttachments: true });
+
+  // };
 
   renderFileUpload = target => {
     return (

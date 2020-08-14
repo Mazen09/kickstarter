@@ -22,19 +22,20 @@ export async function getPost(postId) {
   return client.invokeApi(pathParams, pathTemplate, method, {}, {});
 }
 
-export async function getPresignedURL() {
-  var pathTemplate = "/utils/presignedurls";
+export async function getPresignedURL(filename) {
+  var pathParams = { filename };
+  var pathTemplate = "/utils/presignedurls?filename={filename}";
   var method = "GET";
-  return client.invokeApi({}, pathTemplate, method, {}, {});
+  return client.invokeApi(pathParams, pathTemplate, method, {}, {});
 }
 
 export async function uploadFile(file, url) {
   console.log(file, url);
   var options = {
     headers: { "Content-Type": file["type"], "x-amz-acl": "public-read" }
-  };
+  }; // I tried to add these headers to the request but doesn't work :(
   console.log("options", options);
-  return axios.put(url, file, options);
+  return axios.put(url, file);
 }
 
 export async function getvote(postId, username) {
