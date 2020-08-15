@@ -136,6 +136,23 @@ class Post extends Form {
     }
   };
 
+  renderAttachments = () => {
+    const items = [];
+    const { attachments } = this.state.post;
+    console.log("attachments: ", attachments, attachments.length);
+    for (let i = 0; i < attachments.length; i++) {
+      console.log("attachment: ", attachments[i]);
+    }
+    attachments.forEach(attachment => {
+      items.push(
+        <li className="list-group-item" key={attachment}>
+          <a href={attachment}>{attachment}</a>
+        </li>
+      );
+    });
+    return items;
+  };
+
   render() {
     const { title, username, date, category, tags, content } = this.state.post;
 
@@ -185,6 +202,12 @@ class Post extends Form {
             <div className="col card">
               <div className="card-body">
                 <ReactMarkdown source={content} escapeHtml={false} />
+              </div>
+            </div>
+            <div className="card">
+              <div className="card-body">
+                <h4 className="card-title">attachments</h4>
+                <ul className="list-group">{this.renderAttachments()}</ul>
               </div>
             </div>
             <div className="col card">

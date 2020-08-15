@@ -30,7 +30,6 @@ class reviewPost extends Component {
     try {
       await approvePost(category, id);
       toast.success("Your approval recorded successfully");
-      console.log("approved");
       const { state } = this.props.location;
       window.location = state ? state.from.pathname : "/review";
     } catch (ex) {
@@ -38,6 +37,23 @@ class reviewPost extends Component {
       this.setState({ loading: false });
       toast.error("an error occured. Please try again later.");
     }
+  };
+
+  renderAttachments = () => {
+    const items = [];
+    const { attachments } = this.state.post;
+    console.log("attachments: ", attachments, attachments.length);
+    for (let i = 0; i < attachments.length; i++) {
+      console.log("attachment: ", attachments[i]);
+    }
+    attachments.forEach(attachment => {
+      items.push(
+        <li className="list-group-item" key={attachment}>
+          <a href={attachment}>{attachment}</a>
+        </li>
+      );
+    });
+    return items;
   };
 
   render() {
@@ -69,6 +85,12 @@ class reviewPost extends Component {
             <div className="col card">
               <div className="card-body">
                 <ReactMarkdown source={content} escapeHtml={false} />
+              </div>
+            </div>
+            <div className="card">
+              <div className="card-body">
+                <h4 className="card-title">attachments</h4>
+                <ul className="list-group">{this.renderAttachments()}</ul>
               </div>
             </div>
           </div>

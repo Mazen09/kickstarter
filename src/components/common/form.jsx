@@ -53,6 +53,7 @@ class Form extends Component {
     // console.log(target);
     // console.log(event.target.files);
     // this.addFilesToTarget(target);
+    this.setState({ UploadingAttachments: true });
     this.uploadAttachments(event.target.files);
   };
 

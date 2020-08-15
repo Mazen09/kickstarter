@@ -3,13 +3,14 @@ import Form from "./common/form";
 import Joi from "joi-browser";
 import { getCategories, turnToObjectList } from "./../services/categoryService";
 import LoadingOverlay from "react-loading-overlay";
-import Tags from "./common/tags";
-import { getPresignedURL, uploadFile } from "../services/postService";
+import auth from "../services/authService";
+import { uploadFile, submitPost } from "../services/postService";
 import { toast } from "react-toastify";
 
 class NewPost extends Form {
   state = {
     data: {
+      title: "",
       content: "",
       category: "",
       tags: ""
@@ -18,10 +19,13 @@ class NewPost extends Form {
     tags: [],
     attachments: [],
     errors: {},
-    UploadingAttachments: false
+    loading: false
   };
 
   schema = {
+    title: Joi.string()
+      .required()
+      .label("Title"),
     content: Joi.string()
       .required()
       .label("Content"),
@@ -42,76 +46,69 @@ class NewPost extends Form {
   }
 
   doSubmit = async () => {
-    this.addAttachmentsToContent();
-    this.createTagsList();
-    console.log("submitting", this.state);
+    this.setState({ loading: true });
+    this.submitPost();
   };
 
-  createTagsList = () => {
-    const { tags } = this.state.data;
+  submitPost = async () => {
+    const { title, content, category, tags } = this.state.data;
+    const username = auth.getCurrentUser();
+    const { attachments } = this.state;
+
+    await submitPost(
+      title,
+      content,
+      category,
+      username,
+      this.createTagsList(tags),
+      attachments
+    )
+      .then(res => {
+        toast.success("Your Post submitted successfully");
+        const { state } = this.props.location;
+        window.location = state ? state.from.pathname : "/";
+      })
+      .catch(err => {
+        console.log(err);
+        toast.error("Couldn't submit your Post.");
+        this.setState({ loading: true });
+      });
+  };
+
+  createTagsList = tags => {
     const tagsList = tags
       .trim()
       .split(",")
       .filter(item => {
         return !(item === "");
       });
-    this.setState({ tags: tagsList });
+    return tagsList;
   };
 
-  addAttachmentsToContent = () => {
-    const data = this.state.data;
-    const files = data.files;
-    for (var x = 0; x < files.length; x++) {
-      if (files[x].type.includes("image")) {
-        data["content"] += `\n<img src="${files[x].name}" class="rounded">`;
-      } else if (files[x].type.includes("video")) {
-        data[
-          "content"
-        ] += `\n<iframe width="420" height="345" src="${files[x].name}"/>`;
-      } else {
-        data["content"] += `\n [${files[x].name}](${files[x].name})`;
-      }
-    }
-    this.setState({ data });
-  };
-
-  uploadAttachments = async files => {
+  uploadAttachments = files => {
+    const attachments = [];
     try {
-      Array.from(files).forEach(file => {
-        this.uploadFile(file);
+      Array.from(files).forEach(async file => {
+        await uploadFile(file)
+          .then(res => {
+            attachments.push(res.Location);
+          })
+          .catch(err => {
+            toast.error(`Couldn't Upload ${file.name}`);
+          });
       });
     } catch (error) {
       console.log(error);
       toast.error("Couldn't Upload your attachments. Please try again later");
     }
-    this.setState({ UploadingAttachments: false });
-  };
-
-  uploadFile = async file => {
-    let { data: presignedurl } = await getPresignedURL(
-      file.name.replace(/ /g, "") //remove spaces from file name
-    );
-    await uploadFile(file, presignedurl);
-  };
-
-  putFilenameToURL = (url, name) => {
-    return url.replace("%7Bfilename%7D", name.replace(/ /g, "")); //remove spaces from file name
-  };
-
-  renderAttachments = () => {
-    const items = [];
-    const { attachments } = this.state;
-    for (var x = 0; x < attachments.length; x++) {
-      items.push(attachments[x].name);
-    }
-    return <Tags tags={items} />;
+    this.setState({ attachments, loading: false });
   };
 
   render() {
     const { categories } = this.state;
     return (
       <LoadingOverlay
-        active={this.state.UploadingAttachments}
+        active={this.state.loading}
         spinner
         text="Please wait ..."
       >
@@ -129,18 +126,13 @@ class NewPost extends Form {
                     "name",
                     "name"
                   )}
+                  {this.renderInput("title", "Title")}
                   {this.renderInput("tags", "Tags (comma separated)")}
                   {this.renderTextarea(
                     "content",
                     "write your post here in markdown",
                     "10"
                   )}
-                  <div className="card">
-                    <div className="card-body">
-                      <h4 className="card-title">attachments</h4>
-                      {this.renderAttachments()}
-                    </div>
-                  </div>
                   {this.renderFileUpload("files")}
                   {this.renderButton("Submit")}
                 </form>
