@@ -1,5 +1,4 @@
 import client from "./apigService";
-import axios from "axios";
 import * as AWS from "aws-sdk";
 import v4 from "uuid";
 

@@ -14,7 +14,6 @@ class reviewPost extends Component {
 
   async componentDidMount() {
     const { id, category } = this.props.match.params;
-    console.log("mounting, id: ", id, category);
     const { data: post } = await getReviewPost(category, id);
     this.setState({ post });
   }
@@ -42,10 +41,6 @@ class reviewPost extends Component {
   renderAttachments = () => {
     const items = [];
     const { attachments } = this.state.post;
-    console.log("attachments: ", attachments, attachments.length);
-    for (let i = 0; i < attachments.length; i++) {
-      console.log("attachment: ", attachments[i]);
-    }
     attachments.forEach(attachment => {
       items.push(
         <li className="list-group-item" key={attachment}>

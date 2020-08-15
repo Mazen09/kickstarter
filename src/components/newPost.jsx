@@ -6,6 +6,7 @@ import LoadingOverlay from "react-loading-overlay";
 import auth from "../services/authService";
 import { uploadFile, submitPost } from "../services/postService";
 import { toast } from "react-toastify";
+import { CostExplorer } from "aws-sdk";
 
 class NewPost extends Form {
   state = {
@@ -69,9 +70,9 @@ class NewPost extends Form {
         window.location = state ? state.from.pathname : "/";
       })
       .catch(err => {
+        this.setState({ loading: false });
         console.log(err);
         toast.error("Couldn't submit your Post.");
-        this.setState({ loading: true });
       });
   };
 
@@ -95,13 +96,15 @@ class NewPost extends Form {
           })
           .catch(err => {
             toast.error(`Couldn't Upload ${file.name}`);
+            console.log(err);
           });
       });
     } catch (error) {
+      this.setState({ loading: false });
       console.log(error);
       toast.error("Couldn't Upload your attachments. Please try again later");
     }
-    this.setState({ attachments, loading: false });
+    this.setState({ attachments });
   };
 
   render() {

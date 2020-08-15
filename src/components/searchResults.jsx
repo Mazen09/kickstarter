@@ -56,7 +56,7 @@ class SearchResults extends Component {
               id={minipost.id}
               username={minipost.username}
               date={minipost.date}
-              category={minipost.categoryId}
+              category={minipost.category}
               title={minipost.title}
               type={"post"}
             />
